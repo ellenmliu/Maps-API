@@ -38,6 +38,9 @@ API Course, Lesson 1 -->
      <div class="options-box">
        <span>Draw a shape to search</span>
        <input id="toggle-drawing" type="button" value="Drawing Tool">
+       <hr>
+       <input id="show-listings" type="button" value="Show Listings">
+       <input id="hide-listings" type="button" value="Hide Listings">
        <div id="map"></div>
      </div>
    </div>
@@ -159,9 +162,10 @@ API Course, Lesson 1 -->
          marker.addListener('click', function() {
            showInfoWindow(this, infoWindow);
          });
-         bounds.extend(markers[index].position);
-       })
-       map.fitBounds(bounds);
+       });
+
+       document.getElementById('show-listings').addEventListener('click', showListings);
+       document.getElementById('hide-listings').addEventListener('click', hideListings);
 
        document.getElementById('toggle-drawing').addEventListener('click', function(){
          toggleDrawing(drawingManager);
@@ -170,6 +174,7 @@ API Course, Lesson 1 -->
        drawingManager.addListener('overlaycomplete', function(event){
          if (polygon) {
            polygon.setMap(null);
+           hideListings(markers);
          }
          drawingManager.setDrawingMode(null);
          polygon = event.overlay;
@@ -219,6 +224,21 @@ API Course, Lesson 1 -->
 
          infoWindow.open(map, marker);
        }
+     }
+
+     function showListings() {
+       var bounds = new google.maps.LatLngBounds();
+       markers.forEach(function(data) {
+         data.setMap(map);
+         bounds.extend(data.position);
+       })
+       map.fitBounds(bounds);
+     }
+
+     function hideListings() {
+       markers.forEach(function(data) {
+         data.setMap(null);
+       })
      }
 
      function toggleDrawing(drawingManager){
