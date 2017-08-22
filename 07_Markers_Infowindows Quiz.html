@@ -5,10 +5,26 @@ API Course, Lesson 1 -->
  <!-- styles put here, but you can include a CSS file and reference it instead! -->
    <style type="text/css">
      html, body { height: 100%; margin: 0; padding: 0; }
-     #map { height: 100%; }
+     #map {
+       height: 100%;
+       bottom: 0px;
+       left: 362px;
+       position: absolute;
+       right: 0px;
+     }
      #pano {
        width: 200px;
        height: 200px;
+     }
+     .container {
+       height:100%;
+       position: relative;
+     }
+     .options-box {
+       background: #ffffff;
+       padding: 10px 10px 30px 10px;
+       height: 100%;
+       width: 340px;
      }
      #toggle-drawing {
        width: 27%;
@@ -18,8 +34,13 @@ API Course, Lesson 1 -->
    </style>
  </head>
  <body>
-   <input id="toggle-drawing" type="button" value="Drawing Tool">
-   <div id="map"></div>
+   <div class="container">
+     <div class="options-box">
+       <span>Draw a shape to search</span>
+       <input id="toggle-drawing" type="button" value="Drawing Tool">
+       <div id="map"></div>
+     </div>
+   </div>
    <script type="text/javascript">
      // Create a map variable
      var map;
