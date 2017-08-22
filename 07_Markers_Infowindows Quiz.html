@@ -113,17 +113,23 @@ API Course, Lesson 1 -->
          markers.push(marker);
 
          marker.addListener('click', function() {
-           infoWindow.setContent('<div>' + marker.title + '</div>');
-           infoWindow.open(map, marker);
-
-           infoWindow.addListener('closeclick', function(){
-             infoWindow.setMarker= null;
-           });
+           showInfoWindow(marker, infoWindow);
          });
          bounds.extend(markers[index].position);
        })
        map.fitBounds(bounds);
 
+     }
+     function showInfoWindow(marker, infoWindow){
+       if(infoWindow.marker != marker){
+         infoWindow.marker = marker;
+         infoWindow.setContent('<div>' + marker.title + '</div>');
+         infoWindow.open(map, marker);
+
+         infoWindow.addListener('closeclick', function(){
+           infoWindow.setMarker= null;
+         });
+       }
      }
    </script>
    <script async defer
