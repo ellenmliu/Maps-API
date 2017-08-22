@@ -6,6 +6,10 @@ API Course, Lesson 1 -->
    <style type="text/css">
      html, body { height: 100%; margin: 0; padding: 0; }
      #map { height: 100%; }
+     #pano {
+       width: 200px;
+       height: 200px;
+     }
    </style>
  </head>
  <body>
@@ -13,6 +17,8 @@ API Course, Lesson 1 -->
    <script type="text/javascript">
      // Create a map variable
      var map;
+
+     var markers = [];
      // Function to initialize the map within the map div
      function initMap() {
        var styles = [
@@ -82,8 +88,6 @@ API Course, Lesson 1 -->
          }
        ];
 
-       var markers = [];
-
        map = new google.maps.Map(document.getElementById('map'), {
          center: {lat: 37.77493, lng: -122.419416},
          zoom: 13,
@@ -113,7 +117,7 @@ API Course, Lesson 1 -->
          markers.push(marker);
 
          marker.addListener('click', function() {
-           showInfoWindow(marker, infoWindow);
+           showInfoWindow(this, infoWindow);
          });
          bounds.extend(markers[index].position);
        })
@@ -122,18 +126,44 @@ API Course, Lesson 1 -->
      }
      function showInfoWindow(marker, infoWindow){
        if(infoWindow.marker != marker){
+         infoWindow.setContent('');
          infoWindow.marker = marker;
-         infoWindow.setContent('<div>' + marker.title + '</div>');
-         infoWindow.open(map, marker);
 
          infoWindow.addListener('closeclick', function(){
            infoWindow.setMarker= null;
          });
+
+         var streetViewService = new google.maps.StreetViewService();
+         var radius = 50;
+
+         function getStreetView(data, status) {
+           if (status == google.maps.StreetViewStatus.OK) {
+             var nearStreetViewLocation = data.location.latLng;
+             var heading = google.maps.geometry.spherical.computeHeading(
+               nearStreetViewLocation, marker.position);
+               infoWindow.setContent('<div>' + marker.title + '</div><div id="pano">test</div>');
+               var panoramaOptions = {
+                 position: nearStreetViewLocation,
+                 pov: {
+                   heading: heading,
+                   pitch: 30
+                 }
+               };
+             var panorama = new google.maps.StreetViewPanorama(
+               document.getElementById('pano'), panoramaOptions);
+           } else {
+             infowindow.setContent('<div>' + marker.title + '</div>' +
+               '<div>No Street View Found</div>');
+           }
+         }
+         streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+
+         infoWindow.open(map, marker);
        }
      }
    </script>
    <script async defer
-     src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyAmK09BimCOZycZc_xawQ5rbFAJB8A0cFA&callback=initMap">
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmK09BimCOZycZc_xawQ5rbFAJB8A0cFA&libraries=geometry&v=3&callback=initMap">
    </script>
  </body>
 </html>
