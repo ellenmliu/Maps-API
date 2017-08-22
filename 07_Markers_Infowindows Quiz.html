@@ -10,15 +10,23 @@ API Course, Lesson 1 -->
        width: 200px;
        height: 200px;
      }
+     #toggle-drawing {
+       width: 27%;
+       position: relative;
+       margin-left: 10px;
+     }
    </style>
  </head>
  <body>
+   <input id="toggle-drawing" type="button" value="Drawing Tool">
    <div id="map"></div>
    <script type="text/javascript">
      // Create a map variable
      var map;
 
      var markers = [];
+
+     var polygon = null;
      // Function to initialize the map within the map div
      function initMap() {
        var styles = [
@@ -102,6 +110,17 @@ API Course, Lesson 1 -->
        var infoWindow = new google.maps.InfoWindow();
        var bounds = new google.maps.LatLngBounds();
 
+       var drawingManager = new google.maps.drawing.DrawingManager({
+         drawingMode: google.maps.drawing.OverlayType.POLYGON,
+         drawingControl: true,
+         drawingControlOptions:{
+           position: google.maps.ControlPosition.TOP_LEFT,
+           drawingModes: [
+             google.maps.drawing.OverlayType.POLYGON
+           ]
+         }
+       });
+
        locs.forEach(function(data, index){
          var position = data.location;
          var title = data.title;
@@ -123,7 +142,26 @@ API Course, Lesson 1 -->
        })
        map.fitBounds(bounds);
 
+       document.getElementById('toggle-drawing').addEventListener('click', function(){
+         toggleDrawing(drawingManager);
+       });
+
+       drawingManager.addListener('overlaycomplete', function(event){
+         if (polygon) {
+           polygon.setMap(null);
+         }
+         drawingManager.setDrawingMode(null);
+         polygon = event.overlay;
+         polygon.setEditable(true);
+
+         searchWithinPolygon();
+
+         polygon.getPath().addListener('set_at', searchWithinPolygon);
+         polygon.getPath().addListener('insert_at', searchWithinPolygon);
+       })
      }
+
+
      function showInfoWindow(marker, infoWindow){
        if(infoWindow.marker != marker){
          infoWindow.setContent('');
@@ -161,9 +199,30 @@ API Course, Lesson 1 -->
          infoWindow.open(map, marker);
        }
      }
+
+     function toggleDrawing(drawingManager){
+       if (drawingManager.map) {
+         drawingManager.setMap(null);
+         if(polygon !== null) {
+           polygon.setMap(null);
+         }
+       } else {
+         drawingManager.setMap(map);
+       }
+     }
+
+     function searchWithinPolygon() {
+       markers.forEach(function(data){
+         if (google.maps.geometry.poly.containsLocation(data.position, polygon)) {
+           data.setMap(map);
+         } else {
+           data.setMap(null);
+         }
+       })
+     }
    </script>
    <script async defer
-     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmK09BimCOZycZc_xawQ5rbFAJB8A0cFA&libraries=geometry&v=3&callback=initMap">
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmK09BimCOZycZc_xawQ5rbFAJB8A0cFA&libraries=geometry,drawing&v=3&callback=initMap">
    </script>
  </body>
 </html>
