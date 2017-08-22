@@ -38,6 +38,8 @@ API Course, Lesson 1 -->
      <div class="options-box">
        <span>Draw a shape to search</span>
        <input id="toggle-drawing" type="button" value="Drawing Tool">
+       <br>
+       <span id="area">Total area selected: 0 sq meters</span>
        <hr>
        <input id="show-listings" type="button" value="Show Listings">
        <input id="hide-listings" type="button" value="Hide Listings">
@@ -184,6 +186,9 @@ API Course, Lesson 1 -->
 
          polygon.getPath().addListener('set_at', searchWithinPolygon);
          polygon.getPath().addListener('insert_at', searchWithinPolygon);
+
+         var area = google.maps.geometry.spherical.computeArea(polygon.getPath());
+         document.getElementById('area').innerHTML = 'Total area selected: ' + Math.round(area * 100) / 100 + ' sq meters';
        })
      }
 
